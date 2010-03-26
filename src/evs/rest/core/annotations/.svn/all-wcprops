@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/restframework/!svn/ver/2/trunk/src/evs/rest/core/annotations
+END
+RestAcceptsJSON.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/restframework/!svn/ver/2/trunk/src/evs/rest/core/annotations/RestAcceptsJSON.java
+END
+RestPath.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/restframework/!svn/ver/2/trunk/src/evs/rest/core/annotations/RestPath.java
+END
+RestEntity.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/restframework/!svn/ver/2/trunk/src/evs/rest/core/annotations/RestEntity.java
+END

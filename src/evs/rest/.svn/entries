@@ -1,0 +1,41 @@
+10
+
+dir
+3
+http://svn2.xp-dev.com/svn/restframework/trunk/src/evs/rest
+http://svn2.xp-dev.com/svn/restframework
+
+
+
+2010-03-21T15:11:30.017947Z
+2
+dasjo
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+63f08ce5-8e4c-421a-b1e3-78c1a146b07b
+
+
+
+
+
+
+0
+
+core
+dir
+
+test
+dir
+
