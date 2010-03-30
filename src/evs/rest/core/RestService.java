@@ -2,27 +2,48 @@ package evs.rest.core;
 
 import java.io.IOException;
 
-import javax.net.ssl.SSLEngineResult.Status;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpStatus;
 
-public class RestService extends HttpServlet {
+import evs.rest.core.marshal.JSONMarshaller;
+import evs.rest.core.marshal.RestMarshaller;
+import evs.rest.core.marshal.RestMarshallerException;
+import evs.rest.core.util.RestUtil;
+
+public class RestService extends RestServiceConfig {
+
+	public RestService() throws Exception {
+		super();
+	}
+
+	private static Logger logger = Logger.getLogger(RestService.class);
 
 	private static final long serialVersionUID = 1L;
 	
-	Class myClass = null; //analyseUrl(...);
-
-
+	
 	@Override
+	/**
+	 * handles the REST GET operation
+	 * 
+	 * usage: "http://SERVICE_URI/{id}" retrieves an existing object from the database
+	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-		Class myClass = null; //analyseUrl(...);
+		logger.debug("get received: " + req.getPathInfo());
 		
-		Object id = null; //getIdFromURL
+		Integer id = RestUtil.getIdFromPath(req.getPathInfo());
+		logger.debug("object id: " + id);
 		
-		Object myObject = null; //getObjectFromDB
+		Object myObject = this.persistance.read(id); //getObjectFromDB
 		
+		if(myObject == null) {
+			resp.setStatus(HttpStatus.NOT_FOUND_404);
+			return;
+		}
+		
+				
 		resp.setStatus(200); //TODO: HTTP.status.OK
 		try {
 			resp.getWriter().print("ok");  //TODO: write object JSON/XML
@@ -34,18 +55,49 @@ public class RestService extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+		logger.debug("post received");
+		
+		RestMarshaller marshaller = new JSONMarshaller();
+
+		try {
+			//deserialize object
+			Object object = marshaller.read(this.entityClass, req.getInputStream());
+			
+			//store object
+			Object result = this.persistance.create(object);
+			
+			//response
+			resp.setStatus(HttpStatus.OK_200);
+			marshaller.write(result, resp.getOutputStream());
+			
+			
+		} catch (RestMarshallerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			resp.getWriter().print("saved");  //TODO: write object JSON/XML
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
-		
+		logger.debug("put received");
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-		
+		logger.debug("delete received");
 	}
+	
 	
 	/*
 	 * doHead

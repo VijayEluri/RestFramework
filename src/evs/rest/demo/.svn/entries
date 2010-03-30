@@ -2,9 +2,9 @@
 
 dir
 3
-http://svn2.xp-dev.com/svn/restframework/trunk/src/evs/rest/test
+http://svn2.xp-dev.com/svn/restframework/trunk/src/evs/rest/demo
 http://svn2.xp-dev.com/svn/restframework
-delete
+add
 
 
 2010-03-21T15:11:30.017947Z
@@ -18,9 +18,9 @@ svn:special svn:externals svn:needs-lock
 
 
 
-
-
-
+copied
+http://svn2.xp-dev.com/svn/restframework/trunk/src/evs/rest/test
+3
 
 
 
@@ -38,7 +38,7 @@ file
 
 
 
-delete
+
 2010-03-21T14:40:55.000000Z
 dfa9f821f9ef2a05f626aaa2cbaf9a77
 2010-03-21T15:11:30.017947Z
@@ -52,7 +52,7 @@ has-props
 
 
 
-
+copied
 
 
 
@@ -72,7 +72,7 @@ file
 
 
 
-delete
+
 2010-03-21T14:53:50.000000Z
 f765fa3bbf9a7adfaf3b524cf8af3d1d
 2010-03-21T15:11:30.017947Z
@@ -86,7 +86,7 @@ has-props
 
 
 
-
+copied
 
 
 
@@ -106,7 +106,7 @@ file
 
 
 
-delete
+
 2010-03-21T14:56:17.000000Z
 62042e1f73fa839cba1c01b29e355d16
 2010-03-21T15:11:30.017947Z
@@ -120,7 +120,7 @@ has-props
 
 
 
-
+copied
 
 
 
