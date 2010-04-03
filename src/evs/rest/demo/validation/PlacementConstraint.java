@@ -28,27 +28,32 @@ public @interface PlacementConstraint {
 
 		@Override
 		public void initialize(PlacementConstraint constraint) {
+			logger.debug("init");
 		}
 
 		@Override
 		public boolean isValid(Placement placement, ConstraintValidatorContext context) {
+			logger.debug("validation");
 			Rack rack = placement.getRack();
 			
 			Integer placedSize = 0;
 			
-			/*TODO
+			logger.debug("calculating placed size");
 			if(rack.getPlacements() != null) {
 				for(Placement pl : rack.getPlacements()) {
 					placedSize += pl.getItem().getSize() * pl.getAmount();
+					logger.debug(pl.getItem().getSize() + " (size) * " + pl.getAmount() + " (amount) of item " + pl.getItem().getName());
 				}
-			}*/
+			}
 			
-			Integer newSize = placement.getItem().getSize() * placement.getAmount();
-			
-			if(placedSize + newSize <= rack.getPlace()) {
+			logger.debug("total size is " + placedSize);
+
+			if(placedSize <= rack.getPlace()) {
+				logger.debug("size ok");
 				return true; //OK
 			}
 			else {
+				logger.debug("maxPlace limit exceeded");
 				return false; //max place exceeded
 			}
 		}

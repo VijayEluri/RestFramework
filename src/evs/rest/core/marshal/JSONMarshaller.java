@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
-import evs.rest.core.RestService;
-
 public class JSONMarshaller implements RestMarshaller {
 	private static Logger logger = Logger.getLogger(JSONMarshaller.class);
 
@@ -17,7 +15,7 @@ public class JSONMarshaller implements RestMarshaller {
 
 	public JSONMarshaller() {
 		xstream = new XStream(new JettisonMappedXmlDriver());
-		xstream.setMode(XStream.NO_REFERENCES);
+		//xstream.setMode(XStream.NO_REFERENCES);
 	}
 
 	@Override

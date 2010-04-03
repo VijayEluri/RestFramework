@@ -3,6 +3,7 @@ package evs.rest.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Id;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
@@ -10,8 +11,9 @@ import org.apache.log4j.Logger;
 import evs.rest.core.annotations.RestAcceptedFormats;
 import evs.rest.core.annotations.RestEntity;
 import evs.rest.core.annotations.RestFormat;
+import evs.rest.core.annotations.RestId;
 import evs.rest.core.annotations.RestPath;
-import evs.rest.core.persistance.RestPersistance;
+import evs.rest.core.persistence.RestPersistence;
 import evs.rest.core.util.RestConst;
 import evs.rest.core.util.RestUtil;
 
@@ -33,9 +35,14 @@ public abstract class RestServiceConfig extends HttpServlet {
 	protected Class<Object> entityClass;
 	
 	/**
-	 * the persistance layer, the implementing @RestService uses
+	 * the id class, the implementing @RestService is configured for
 	 */
-	protected RestPersistance persistance;
+	protected Class<Object> idClass;
+	
+	/**
+	 * the persistence layer, the implementing @RestService uses
+	 */
+	protected RestPersistence persistence;
 	
 	/**
 	 * a list of @RestFormats, the implementing @RestService provides
@@ -60,6 +67,19 @@ public abstract class RestServiceConfig extends HttpServlet {
 			logger.debug(e.getMessage(), e);
 			throw e;
 		}
+		
+
+		logger.debug("processing Id annotation");
+		RestId idAnnotation = this.getClass().getAnnotation(RestId.class);
+		if(idAnnotation != null) {
+			this.idClass = (Class<Object>)idAnnotation.value();
+		}
+		else {			
+			this.idClass = RestConst.DEFAULT_ID_CLASS;
+			logger.debug("no RestId given, using default");
+		}
+		logger.debug("idClass = " + this.idClass.getName());
+
 		
 		logger.debug("processing RestAcceptedFormats annotation");
 		RestAcceptedFormats formatsAnnotation = this.getClass().getAnnotation(RestAcceptedFormats.class);
@@ -96,23 +116,31 @@ public abstract class RestServiceConfig extends HttpServlet {
 	}
 
 	public Class<Object> getEntityClass() {
-		return entityClass;
+		return this.entityClass;
 	}
 
 	public void setEntityClass(Class<Object> entityClass) {
 		this.entityClass = entityClass;
 	}
 
-	public RestPersistance getPersistance() {
-		return persistance;
+	public Class<Object> getIdClass() {
+		return this.idClass;
 	}
 
-	public void setPersistance(RestPersistance persistance) {
-		this.persistance = persistance;
+	public void setIdClass(Class<Object> idClass) {
+		this.idClass = idClass;
+	}
+
+	public RestPersistence getPersistence() {
+		return this.persistence;
+	}
+
+	public void setPersistence(RestPersistence persistence) {
+		this.persistence = persistence;
 	}
 
 	public List<RestFormat> getFormats() {
-		return formats;
+		return this.formats;
 	}
 
 	public void setFormats(List<RestFormat> formats) {

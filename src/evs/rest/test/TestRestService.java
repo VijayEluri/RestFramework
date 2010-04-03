@@ -7,6 +7,11 @@ import org.junit.Test;
 import evs.rest.core.RestService;
 import evs.rest.core.annotations.RestEntity;
 import evs.rest.core.annotations.RestPath;
+import evs.rest.core.persistence.HibernatePersistence;
+import evs.rest.core.persistence.RestPersistence;
+import evs.rest.demo.domain.Item;
+import evs.rest.demo.domain.Placement;
+import evs.rest.demo.domain.Rack;
 
 
 public class TestRestService {

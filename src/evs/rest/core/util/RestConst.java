@@ -6,5 +6,6 @@ public abstract class RestConst {
 
 	public static final String DEFAULT_SERVICE_PATH = "/";
 	public static final RestFormat DEFAULT_FORMAT = RestFormat.JSON;
+	public static final Class<Object> DEFAULT_ID_CLASS = (Class)Long.class;
 
 }

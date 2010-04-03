@@ -7,19 +7,39 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 
 
 @Entity
 public class Rack {
 	
+	/*** member variables ***/
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	protected Long id;
+	
 	protected String name;
+	
 	protected String description;
+	
 	protected Integer place;
-	//protected List<Placement> placements = new ArrayList<Placement>();
+	
+	@OneToMany
+	protected List<Placement> placements = new ArrayList<Placement>();
+	
+	/*** constructor ***/
+	
+	public Rack() { }
+	
+	public Rack(String name, String description, Integer place) {
+		this.name = name;
+		this.description = description;
+		this.place = place;
+	}
+	
+	/*** getters and setters ***/
 	
 	public Long getId() {
 		return id;
@@ -45,10 +65,10 @@ public class Rack {
 	public void setPlace(Integer place) {
 		this.place = place;
 	}
-	/*public List<Placement> getPlacements() {
+	public List<Placement> getPlacements() {
 		return placements;
 	}
 	public void setPlacements(List<Placement> placements) {
 		this.placements = placements;
-	}*/
+	}
 }

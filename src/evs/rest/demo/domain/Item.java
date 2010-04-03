@@ -1,12 +1,38 @@
 package evs.rest.demo.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.Min;
+
+@Entity
 public class Item {
 	
+	/*** member variables ***/
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	protected Long id;
+	
 	protected String name;
+	
 	protected String description;
+	
+	@Min(1)
 	protected Integer size;
 	
+	/*** constructor ***/
+	
+	public Item() { }
+	
+	public Item(String name, String description, Integer size) {
+		this.name = name;
+		this.description = description;
+		this.size = size;
+	}
+	
+	/*** getters and setters ***/	
 	
 	public Long getId() {
 		return id;
