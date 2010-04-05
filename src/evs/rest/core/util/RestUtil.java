@@ -17,22 +17,29 @@ public class RestUtil {
 	//Pattern patGetId = Pattern.compile("/[0-9]{1,}");
 	//Matcher patGetMatcher = patGetId.matcher("");
 	
-	public static Long getIdFromPath(String path) {
+	public static Object getIdFromPath(String path, Class<Object> idClass) {
+		
+		if(!idClass.equals(Long.class)) {
+			//TODO: id type conversion
+			logger.warn("not implemented idClass");
+		}
+		
 		/*patGetMatcher.reset(path);
 		if(!patGetMatcher.find()) {
 			logger.debug(path + "didn't match " + patGetMatcher.pattern().pattern());
 			return -1;
 		}*/
-		Integer id;
 		if(path != null && path.length() > 0) {
 			try {
-				return Long.valueOf(path.substring(1));
+				String id = path.substring(1);
+				logger.debug("object id: " + id);
+				return Long.valueOf(id);
 			}
 			catch(Exception e) {
 			}
 		}
 		logger.debug("invalid id path: " + path);
-		return Long.valueOf(-1);
+		return Long.valueOf(-1);	//TODO: id from path exception handling
 	}
 
 	/**
@@ -55,6 +62,15 @@ public class RestUtil {
 		
 		return path;
 	}
+
+	/**
+	 * a default path-name will be generated from the service's class name. eg.: Class Rack would be "racks"
+	 * @param service the rest service class which the path is for
+	 * @return the calculated path without leading "/", but ending with "/*"
+	 */
+	public static String defaultServicePath(RestServiceConfig config) {
+		return servicePath(config, null);
+	}
 	
 	
 	/**
@@ -64,8 +80,8 @@ public class RestUtil {
 	 * @param clazz the object class
 	 * @return the object on success, null on error
 	 */
-	public static Object unmarshalRequest(HttpServletRequest req,
-			RestMarshaller marshaller, Class<Object> clazz) {
+	public static <T> T unmarshalRequest(HttpServletRequest req,
+			RestMarshaller marshaller, Class<T> clazz) {
 
 		try {
 			return marshaller.read(clazz, req.getInputStream());
@@ -97,5 +113,6 @@ public class RestUtil {
 			e.printStackTrace();
 		}
 	}
+
 
 }

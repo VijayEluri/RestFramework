@@ -1,7 +1,10 @@
 package evs.rest.demo.validation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -14,8 +17,9 @@ import evs.rest.demo.domain.Placement;
 import evs.rest.demo.domain.Rack;
 
 @Constraint(validatedBy=PlacementConstraint.PlacementValidator.class)
-//@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface PlacementConstraint {
 	String message() default "Total of placement.amount * item.size must not excee rack.place";
 	
@@ -26,29 +30,17 @@ public @interface PlacementConstraint {
 	class PlacementValidator implements ConstraintValidator<PlacementConstraint, Placement> {
 		private static Logger logger = Logger.getLogger(PlacementValidator.class);
 
-		@Override
+		
 		public void initialize(PlacementConstraint constraint) {
 			logger.debug("init");
 		}
 
-		@Override
+		
 		public boolean isValid(Placement placement, ConstraintValidatorContext context) {
 			logger.debug("validation");
 			Rack rack = placement.getRack();
 			
-			Integer placedSize = 0;
-			
-			logger.debug("calculating placed size");
-			if(rack.getPlacements() != null) {
-				for(Placement pl : rack.getPlacements()) {
-					placedSize += pl.getItem().getSize() * pl.getAmount();
-					logger.debug(pl.getItem().getSize() + " (size) * " + pl.getAmount() + " (amount) of item " + pl.getItem().getName());
-				}
-			}
-			
-			logger.debug("total size is " + placedSize);
-
-			if(placedSize <= rack.getPlace()) {
+			if(Rack.calculatePlacedSize(rack) <= rack.getPlace()) {
 				logger.debug("size ok");
 				return true; //OK
 			}

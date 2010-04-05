@@ -13,9 +13,16 @@ public interface RestMarshaller {
 	 * @param clazz object's class
 	 * @param input the input stream to deserialize the object from
 	 * @return the object
+	 * @throws RestMarshallerException
 	 */
-	public Object read(Class<Object> clazz, InputStream input) throws RestMarshallerException;
+	public <T> T read(Class<T> clazz, InputStream input) throws RestMarshallerException;
 	
+	/**
+	 * writes an object
+	 * @param object
+	 * @param output the output stream to serialize the object to
+	 * @throws RestMarshallerException
+	 */
 	public void write(Object object, OutputStream output) throws RestMarshallerException;
 
 }

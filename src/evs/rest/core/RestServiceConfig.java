@@ -3,16 +3,17 @@ package evs.rest.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Id;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
 
 import evs.rest.core.annotations.RestAcceptedFormats;
 import evs.rest.core.annotations.RestEntity;
-import evs.rest.core.annotations.RestFormat;
 import evs.rest.core.annotations.RestId;
 import evs.rest.core.annotations.RestPath;
+import evs.rest.core.annotations.RestSearchIndexedFields;
+import evs.rest.core.annotations.RestSearchPath;
+import evs.rest.core.marshal.RestFormat;
 import evs.rest.core.persistence.RestPersistence;
 import evs.rest.core.util.RestConst;
 import evs.rest.core.util.RestUtil;
@@ -53,9 +54,30 @@ public abstract class RestServiceConfig extends HttpServlet {
 	 * the url path, the implementing @RestService is configured for
 	 */
 	protected String path;
+
+	/**
+	 * a list of full-text-searchable columns, the implementing @RestService provides
+	 */
+	protected List<String> searchIndexedFields = null;
+	
+	/**
+	 * the search path, the implementing @RestService is configured for
+	 */
+	protected String searchPath;
 	
 	public RestServiceConfig() throws Exception {
-
+		processRestEntityAnnotation();
+		processRestIdAnnotation();
+		processRestAcceptedFormatsAnnotation();
+		processRestPathAnnotation();
+		processRestSearchIndexedFieldsAnnotation();
+		if(this.searchIndexedFields != null) {
+			processRestSarchPathAnnotation();
+		}
+	}
+	
+	
+	private void processRestEntityAnnotation() throws Exception {
 		logger.debug("processing RestEntity annotation");
 		RestEntity entityAnnotation = this.getClass().getAnnotation(RestEntity.class);
 		if(entityAnnotation != null) {
@@ -67,8 +89,10 @@ public abstract class RestServiceConfig extends HttpServlet {
 			logger.debug(e.getMessage(), e);
 			throw e;
 		}
-		
+	}
 
+
+	private void processRestIdAnnotation() {
 		logger.debug("processing Id annotation");
 		RestId idAnnotation = this.getClass().getAnnotation(RestId.class);
 		if(idAnnotation != null) {
@@ -76,16 +100,18 @@ public abstract class RestServiceConfig extends HttpServlet {
 		}
 		else {			
 			this.idClass = RestConst.DEFAULT_ID_CLASS;
-			logger.debug("no RestId given, using default");
+			logger.debug("no RestId provided, using default");
 		}
 		logger.debug("idClass = " + this.idClass.getName());
+	}
 
-		
+
+	private void processRestAcceptedFormatsAnnotation() {
 		logger.debug("processing RestAcceptedFormats annotation");
 		RestAcceptedFormats formatsAnnotation = this.getClass().getAnnotation(RestAcceptedFormats.class);
-		if(formatsAnnotation == null || formatsAnnotation.value() == null) {
+		if(formatsAnnotation == null || formatsAnnotation.value() == null || formatsAnnotation.value().length == 0) {
 			this.formats.add(RestConst.DEFAULT_FORMAT);
-			logger.debug("no format given, using default: " + RestConst.DEFAULT_FORMAT);
+			logger.debug("no format provided, using default: " + RestConst.DEFAULT_FORMAT);
 		}
 		else {
 			for(RestFormat format : formatsAnnotation.value()) {
@@ -93,26 +119,58 @@ public abstract class RestServiceConfig extends HttpServlet {
 				logger.debug("added format: " + format);
 			}
 		}
-		
+	}
+
+
+	private void processRestPathAnnotation() {
 		logger.debug("processing RestPath annotation");
 		RestPath pathAnnotation = this.getClass().getAnnotation(RestPath.class);
 		if(pathAnnotation == null) {
-			this.setPath(null);
-			logger.debug("no path given, using default: " + this.path);
+			this.path = RestUtil.defaultServicePath(this);	//will automatically set default path
+			logger.debug("no path provided, using default: " + this.path);
 		}
 		else {
-			this.setPath(pathAnnotation.value());
+			this.path = RestUtil.servicePath(this, pathAnnotation.value());
 			logger.debug("path set: " + this.path);
 		}
-		
 	}
-	
+
+
+	private void processRestSearchIndexedFieldsAnnotation() {
+		logger.debug("processing RestSearchIndexedFields annotation");
+		RestSearchIndexedFields searchAnnotation = this.getClass().getAnnotation(RestSearchIndexedFields.class);
+		if(searchAnnotation == null || searchAnnotation.value() == null || searchAnnotation.value().length == 0) {
+			logger.debug("no search fields defined");
+		}
+		else {
+			this.searchIndexedFields = new ArrayList<String>();
+			for(String field : searchAnnotation.value()) {
+				this.searchIndexedFields.add(field);
+				logger.debug("added search field: " + field);
+			}
+		}
+	}
+
+
+	private void processRestSarchPathAnnotation() {
+		logger.debug("processing RestSearchPath annotation");
+		RestSearchPath searchPathAnnotation = this.getClass().getAnnotation(RestSearchPath.class);
+		if(searchPathAnnotation == null) {
+			this.setSearchPath(RestConst.DEFAULT_SEARCH_PATH);
+			logger.debug("no search path provided, using default: " + this.searchPath);
+		}
+		else {
+			this.setSearchPath(searchPathAnnotation.value());
+			logger.debug("search path set: " + this.searchPath);
+		}
+	}
+
 	public String getPath() {
 		return this.path;
 	}
 	
 	public void setPath(String path) {
-		this.path = RestUtil.servicePath(this, path);
+		this.path = path;
 	}
 
 	public Class<Object> getEntityClass() {
@@ -145,6 +203,14 @@ public abstract class RestServiceConfig extends HttpServlet {
 
 	public void setFormats(List<RestFormat> formats) {
 		this.formats = formats;
+	}
+	
+	public String getSearchPath() {
+		return this.searchPath;
+	}
+	
+	public void setSearchPath(String searchPath) {
+		this.searchPath = searchPath;
 	}
 
 }

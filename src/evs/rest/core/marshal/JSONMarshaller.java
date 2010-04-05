@@ -19,10 +19,10 @@ public class JSONMarshaller implements RestMarshaller {
 	}
 
 	@Override
-	public Object read(Class<Object> clazz, InputStream input)
-	throws RestMarshallerException {
+	public <T> T read(Class<T> clazz, InputStream input)
+			throws RestMarshallerException {
 		try {
-			Object object = xstream.fromXML(input);
+			T object = (T)xstream.fromXML(input);
 			if(object.getClass() != clazz) {
 				RestMarshallerException e = new RestMarshallerException("deserialized object class: " + object.getClass() + " doesn't match expected: " + clazz);
 				logger.debug(e.getMessage(), e);
@@ -35,6 +35,7 @@ public class JSONMarshaller implements RestMarshaller {
 			throw new RestMarshallerException("parse exception");
 		}
 	}	
+
 	
 	@Override
 	public void write(Object object, OutputStream output)
