@@ -21,7 +21,7 @@ import evs.rest.demo.domain.Rack;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface PlacementConstraint {
-	String message() default "Total of placement.amount * item.size must not excee rack.place";
+	String message() default "Total of placement.amount * item.size must not exceed rack.place";
 	
     Class<?>[] groups() default {};
     

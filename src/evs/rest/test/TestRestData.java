@@ -1,14 +1,12 @@
 package evs.rest.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import evs.rest.core.persistence.RestPersistence;
+import evs.rest.core.persistence.RestPersistenceException;
 import evs.rest.core.persistence.RestPersistenceValidationException;
 import evs.rest.demo.domain.Item;
 import evs.rest.demo.domain.Placement;
@@ -21,7 +19,7 @@ public abstract class TestRestData {
 	protected RestPersistence persistence;
 
 	@Test
-	public void testRackDataCreation() throws RestPersistenceValidationException {
+	public void testRackDataCreation() throws RestPersistenceValidationException, RestPersistenceException {
 		Rack rack = new Rack("Rack", "A 5 slot rack", 5);
 		persistence.create(rack);
 
@@ -44,11 +42,8 @@ public abstract class TestRestData {
 
 	}
 	
-
-
-
 	private void createAndPlaceItem(Rack rack, Integer itemSlots,
-			Integer placementAmount) throws RestPersistenceValidationException {
+			Integer placementAmount) throws RestPersistenceValidationException, RestPersistenceException {
 		
 		logger.debug("new item with " + itemSlots + " slots, placed " + placementAmount + " times");
 		

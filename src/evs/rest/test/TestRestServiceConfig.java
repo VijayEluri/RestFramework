@@ -42,13 +42,13 @@ public class TestRestServiceConfig {
 	@Test
 	public void testCustomPathValid() throws Exception {
 		RestService service = new CustomPathService();
-		Assert.assertEquals("path/*", service.getPath());
+		Assert.assertEquals("path", service.getPath());
 	}
 	
 	@Test
 	public void restDefaultPath() throws Exception {
 		RestService service = new DefaultPathService();
-		Assert.assertEquals("cars/*", service.getPath());
+		Assert.assertEquals("cars", service.getPath());
 	}
 
 }

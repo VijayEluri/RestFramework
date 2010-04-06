@@ -1,6 +1,7 @@
 package evs.rest.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServlet;
@@ -110,14 +111,17 @@ public abstract class RestServiceConfig extends HttpServlet {
 		logger.debug("processing RestAcceptedFormats annotation");
 		RestAcceptedFormats formatsAnnotation = this.getClass().getAnnotation(RestAcceptedFormats.class);
 		if(formatsAnnotation == null || formatsAnnotation.value() == null || formatsAnnotation.value().length == 0) {
-			this.formats.add(RestConst.DEFAULT_FORMAT);
-			logger.debug("no format provided, using default: " + RestConst.DEFAULT_FORMAT);
+			this.formats.addAll(Arrays.asList(RestConst.DEFAULT_FORMATS));
+			logger.debug("no format provided, using defaults");
 		}
 		else {
 			for(RestFormat format : formatsAnnotation.value()) {
 				this.formats.add(format);
-				logger.debug("added format: " + format);
 			}
+		}
+
+		for(RestFormat format : this.formats) {
+			logger.debug("format: " + format);
 		}
 	}
 

@@ -6,6 +6,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import evs.rest.demo.validation.PlacementConstraint;
 
@@ -26,8 +27,8 @@ public class Placement {
 	public Placement() { }
 	
 	public Placement(Rack rack, Item item, Integer amount, String storing_position) {
-		this.id.rack = rack;
-		this.id.item = item;
+		this.id.setRack(rack);
+		this.id.setItem(item);
 		this.amount = amount;
 		this.storing_position = storing_position;
 	}
@@ -35,16 +36,16 @@ public class Placement {
 	/*** getters and setters ***/
 
 	public Rack getRack() {
-		return this.id.rack;
+		return this.id.getRack();
 	}
 	public void setRack(Rack rack) {
-		this.id.rack = rack;
+		this.id.setRack(rack);
 	}
 	public Item getItem() {
-		return this.id.item;
+		return this.id.getItem();
 	}
 	public void setItem(Item item) {
-		this.id.item = item;
+		this.id.setItem(item);
 	}
 
 	public Integer getAmount() {
@@ -59,34 +60,81 @@ public class Placement {
 	public void setStoring_position(String storingPosition) {
 		this.storing_position = storingPosition;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+        if (this == other) return true;
+        if ( !(other instanceof Placement) ) return false;
 
+        final Placement placement = (Placement) other;
+        
+        if(!RackUtil.compare(this.getItem(), placement.getItem())) return false;
+        if(!RackUtil.compare(this.getRack(), placement.getRack())) return false;
+        if(!RackUtil.compare(this.getAmount(), placement.getAmount())) return false;
+        if(!RackUtil.compare(this.getStoring_position(), placement.getStoring_position())) return false;
+
+        return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+	
+	
 	/**
 	 * composite private key class
 	 */
 	@Embeddable
 	public class PlacementPk implements Serializable {
-
+		
+		@OneToOne
+		protected Item item;
+		
 		@ManyToOne
 		protected Rack rack;
 
-		@ManyToOne
-		protected Item item;
-
 		public PlacementPk() {} 
 
-		// serializeable implementation follows
-
 		private static final long serialVersionUID = 1L;
-
-		public boolean equals(Object obj) {
-			//TODO: equals
-			return false;
+		
+		public Item getItem() {
+			return item;
 		}
 
-		public int hashCode() {      		
-			//TODO: hashcode
-			return 0;
+		public void setItem(Item item) {
+			this.item = item;
+		}
+
+		public Rack getRack() {
+			return rack;
+		}
+
+		public void setRack(Rack rack) {
+			this.rack = rack;
+		}
+
+
+		public boolean equals(Object other) {
+	        if (this == other) return true;
+	        if ( !(other instanceof PlacementPk) ) return false;
+	        
+	        final PlacementPk pk = (PlacementPk) other;
+	        
+	        if(!this.item.equals(pk.getItem())) return false;
+	        if(!this.rack.equals(pk.getRack())) return false;
+	        
+			return true;
+		}
+
+		public int hashCode() {   
+			int hc = 0;
+			if(this.item != null) hc += this.item.hashCode();
+			if(this.rack != null) hc += this.rack.hashCode();
+			return hc;
 		}
 	}
+	
+	
 
 }

@@ -92,4 +92,48 @@ public class Rack {
 		return placedSize;
 	}
 	
+	@Override
+	public boolean equals(Object other) {
+        if (this == other) return true;
+        if ( !(other instanceof Rack) ) return false;
+
+        final Rack rack = (Rack) other;
+
+        if(this.getName() == null) {
+        	if(!(rack.getName() == null)) return false;
+        }
+        if(!RackUtil.compare(this.getName(), rack.getName())) return false;
+        if(!RackUtil.compare(this.getDescription(), rack.getDescription())) return false;
+        if(!RackUtil.compare(this.getPlace(), rack.getPlace())) return false;
+        
+    	if(this.getPlacements() == null) return false;
+    	if(rack.getPlacements() == null) return false;
+    	if(this.getPlacements().size() != rack.getPlacements().size()) return false;
+    	
+    	for(Placement placement : this.getPlacements()) {
+    		boolean found = false;
+    		for(Placement otherPlacement : rack.getPlacements()) {
+    			if(placement.hashCode() == otherPlacement.hashCode()) found = true;
+    			//if(placement.equals(otherPlacement)) found = true;
+    		}
+    		if(!found) return false;
+    	}
+       
+        return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		if(this.getId() != null) {
+			return this.getId().hashCode();
+		}
+		else {
+			int hc = 0;
+			if(this.getName() != null) hc += this.getName().hashCode();
+			if(this.getDescription() != null) hc += this.getDescription().hashCode();
+			if(this.getPlace() != null) hc += this.getPlace().hashCode();
+			return hc;
+		}
+	}
+	
 }

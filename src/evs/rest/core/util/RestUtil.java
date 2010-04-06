@@ -46,16 +46,18 @@ public class RestUtil {
 	 * sets the correct path for a service. eg: "rack"
 	 * @param service the rest service class which the path is for
 	 * @param path a custom path. if null, a default path-name will be generated from the service's class name. eg.: Class Rack would be "racks"
-	 * @return the calculated path without leading "/", but ending with "/*"
+	 * @return the calculated path without leading "/"
 	 */
 	public static String servicePath(RestServiceConfig config, String path) {
 		if(path == null)
 			path = config.getEntityClass().getSimpleName().toLowerCase() + "s";
 		
+		/*
 		if(!path.endsWith("/*") && path.endsWith("/"))
 			path += "*";
 		else
 			path += "/*";
+		*/
 		
 		if(path.startsWith("/"))
 			path = path.substring(1);
@@ -66,7 +68,7 @@ public class RestUtil {
 	/**
 	 * a default path-name will be generated from the service's class name. eg.: Class Rack would be "racks"
 	 * @param service the rest service class which the path is for
-	 * @return the calculated path without leading "/", but ending with "/*"
+	 * @return the calculated path without leading "/"
 	 */
 	public static String defaultServicePath(RestServiceConfig config) {
 		return servicePath(config, null);

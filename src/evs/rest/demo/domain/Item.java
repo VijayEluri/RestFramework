@@ -59,5 +59,33 @@ public class Item {
 		this.size = size;
 	}
 	
+	@Override
+	public boolean equals(Object other) {
+        if (this == other) return true;
+        if ( !(other instanceof Item) ) return false;
+
+        final Item item = (Item) other;
+
+        if(!RackUtil.compare(this.getName(), item.getName())) return false;
+        if(!RackUtil.compare(this.getDescription(), item.getDescription())) return false;
+        if(!RackUtil.compare(this.getSize(), item.getSize())) return false;
+
+        return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		if(this.getId() != null) {
+			return this.getId().hashCode();
+		}
+		else {
+			int hc = 0;
+			if(this.getName() != null) hc += this.getName().hashCode();
+			if(this.getDescription() != null) hc += this.getDescription().hashCode();
+			if(this.getSize() != null) hc += this.getSize().hashCode();
+			return hc;
+		}
+	}
+	
 	
 }

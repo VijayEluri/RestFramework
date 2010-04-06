@@ -4,19 +4,29 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
+
+import evs.rest.test.TestRestService;
+
 
 public class RestMarshallerFactory {
+	private static Logger logger = Logger.getLogger(RestMarshallerFactory.class);
 	
-	private static RestMarshaller jsonMarshaller = new JSONMarshaller();
+	private static RestMarshaller jsonMarshaller = new XStreamJSONMarshaller();
+	private static RestMarshaller xmlMarshaller = new XStreamXMLMarshaller();
 	
-
 	public static RestMarshaller getMarshaller(RestFormat format) {
+		RestMarshaller marshaller = null;
 		switch (format) {
 		case JSON:
-			return jsonMarshaller;
+			marshaller = jsonMarshaller;
+			break;
+		case XML:
+			marshaller = xmlMarshaller;
+			break;
 		}
-		//TODO: xml
-		return null;
+		logger.debug("marshaller is: " + marshaller.toString());
+		return marshaller;
 	}
 	
 	/**
@@ -28,6 +38,7 @@ public class RestMarshallerFactory {
 	public static RestMarshaller getMarshallerFromMimeCheck(
 			HttpServletRequest req, List<RestFormat> formats) {
 		String mimeType = req.getContentType();
+		logger.debug("determining marshaller for request format mimeType: " + mimeType);
 		try {
 			if(mimeType != null) {
 				//format specified
@@ -39,7 +50,7 @@ public class RestMarshallerFactory {
 				return null;
 			}
 			else {
-				//no format specified, returning first of supported formats
+				logger.debug("no format specified, using default formatter");
 				return RestMarshallerFactory.getMarshaller(formats.get(0));
 			}
 		} catch (RestFormatException e) {

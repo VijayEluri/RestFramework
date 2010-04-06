@@ -55,7 +55,7 @@ public class RestServer {
             for(RestService service : this.services) {
             	logger.debug("adding service: " + service.getClass().getName());
             	
-        		String publishPath = this.serverPath + service.getPath();
+        		String publishPath = this.serverPath + service.getPath() + "/*";
         		logger.debug("publish path: " + publishPath);
         		
         		service.setPersistence(this.persistence);
