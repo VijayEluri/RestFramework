@@ -4,6 +4,7 @@ import evs.rest.core.RestService;
 import evs.rest.core.annotations.RestAcceptedFormats;
 import evs.rest.core.annotations.RestEntity;
 import evs.rest.core.annotations.RestId;
+import evs.rest.core.annotations.RestPath;
 import evs.rest.core.annotations.RestSearchIndexedFields;
 import evs.rest.core.annotations.RestSearchPath;
 import evs.rest.core.marshal.RestFormat;
@@ -11,7 +12,7 @@ import evs.rest.demo.domain.Rack;
 
 @RestEntity(Rack.class)
 @RestId(Long.class)
-//@RestPath("rack")
+@RestPath("rack")
 @RestAcceptedFormats({RestFormat.JSON, RestFormat.XML})
 @RestSearchIndexedFields({"name", "description"})
 @RestSearchPath("search")

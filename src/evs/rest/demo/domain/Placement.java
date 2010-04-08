@@ -86,7 +86,7 @@ public class Placement {
 	 * composite private key class
 	 */
 	@Embeddable
-	public class PlacementPk implements Serializable {
+	public static class PlacementPk implements Serializable {
 		
 		@OneToOne
 		protected Item item;

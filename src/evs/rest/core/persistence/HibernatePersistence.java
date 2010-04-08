@@ -52,7 +52,6 @@ public class HibernatePersistence implements RestPersistence {
 	public <T> T create(T object) throws RestPersistenceValidationException,
 			RestPersistenceException {
 		// TODO object already exists
-		// TODO exception handling
 		logger.debug("create request for object" + object.toString());
 		validate(object);
 		try {
@@ -166,6 +165,16 @@ public class HibernatePersistence implements RestPersistence {
 		// em.detach(entity);
 		// org.hibernate.Session session = (Session) em.getDelegate();
 		// session.evict(entity);
+		
+		/*
+		 * private <T> T getRealObject(T obj) {
+  Hibernate.initialize(obj);
+  if (obj instanceof HibernateProxy) {
+   return (T) ((HibernateProxy) obj).getHibernateLazyInitializer().getImplementation();
+  }
+  return obj;
+ }
+		 */
 	}
 
 	private void validate(Object object)

@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import evs.rest.core.RestServer;
 import evs.rest.core.RestService;
+import evs.rest.core.interceptors.BasicInterceptor;
 import evs.rest.core.marshal.RestMarshaller;
 import evs.rest.core.marshal.RestMarshallerException;
 import evs.rest.core.marshal.XStreamJSONMarshaller;
@@ -44,19 +45,22 @@ import evs.rest.demo.domain.Rack;
 
 
 public abstract class TestRestService {
-	private static final String SERVICE_URL = "http://localhost:8777/";
 	private static Logger logger = Logger.getLogger(TestRestService.class);
 	
 	private static RackService rackService;
 	private static ItemService itemService;
 	private static PlacementService placementService;
-	
+
+	protected static int serverPort;
 	protected static RestMarshaller marshaller;
 	protected static String mimeType;
+	protected static String serverURL;
 	
-	@BeforeClass
 	public static void prepareClass() throws Exception {
+		
 		RestServer provider = new RestServer();
+		
+		provider.addInterceptor(new BasicInterceptor());
 		
 		rackService = new RackService();
 		provider.addService(rackService);
@@ -68,8 +72,12 @@ public abstract class TestRestService {
 		provider.addService(placementService);
 		
 		provider.setServerPath("/");
-
+		provider.setServerPort(serverPort);
+		
 		provider.start();
+		
+		serverURL = "http://localhost:" + serverPort + "/";
+		
 	}
 	
 	
@@ -88,6 +96,13 @@ public abstract class TestRestService {
 		Rack rack = new Rack("Rack", "A 5 slot rack", 5);
 		Rack savedRack = post(rack, Rack.class, rackService);
 		Assert.assertEquals(rack, savedRack);
+	}
+	
+	@Test
+	public void testPostComplex() throws Exception {
+		Rack rack = new Rack("Rack", "A 5 slot rack", 5);
+		Rack savedRack = post(rack, Rack.class, rackService);
+		Assert.assertEquals(rack, savedRack);
 		
 		createAndPlaceItem(savedRack, 1, 1);	//itemSlots, placementAmount
 		createAndPlaceItem(savedRack, 2, 2);
@@ -103,7 +118,7 @@ public abstract class TestRestService {
 		} catch (Exception e) {
 			Assert.assertTrue(e.getMessage().contains("validation errors"));
 			Assert.assertTrue(e.getMessage().contains("Total of placement.amount * item.size must not exceed rack.place"));
-			logger.debug("over-limit validation exception");
+			logger.debug("caught expected over-limit validation exception, good ;)");
 			return;
 		}
 	}
@@ -143,9 +158,8 @@ public abstract class TestRestService {
 		put(savedRack, Rack.class, rackService);
 		
 		Rack retrieved = get(savedRack.getId(), Rack.class, rackService);
-		Assert.assertEquals(rack, retrieved);
+		Assert.assertEquals(savedRack, retrieved);
 	}
-
 	
 	@Test 
 	public void testPut() throws Exception {
@@ -159,6 +173,17 @@ public abstract class TestRestService {
 		
 		Rack retrieved = get(updated.getId(), Rack.class, rackService);
 		Assert.assertEquals(saved, retrieved);
+	}
+	
+	@Test 
+	public void testPutComplex() throws Exception {
+		Rack rack = new Rack("Rack", "A 5 slot rack", 5);
+		Rack savedRack = post(rack, Rack.class, rackService);
+		createAndPlaceItem(savedRack, 1, 1);	//itemSlots, placementAmount
+		createAndPlaceItem(savedRack, 2, 2);
+		Rack updated = put(savedRack, Rack.class, rackService);
+		
+		Assert.assertEquals(savedRack, updated);
 	}
 	
 	@Test
@@ -212,7 +237,7 @@ public abstract class TestRestService {
 	}
 
 	private List<Rack> search(String text) throws IOException, ClientProtocolException, Exception {
-		HttpGet httpget = new HttpGet(SERVICE_URL + rackService.getPath() + "/search?text=" + text);
+		HttpGet httpget = new HttpGet(serverURL + rackService.getPath() + "/search?text=" + text);
 		httpget.setHeader("Content-Type", mimeType);
 		HttpResponse response = httpclient.execute(httpget);
 		List<Rack> result = readFromResponse(ArrayList.class, response);
@@ -222,7 +247,7 @@ public abstract class TestRestService {
 	/*** post, get, put, delete, search HTTP client-server REST communication wrappers ***/
 
 	private <T> T post(T object, Class<T> clazz, RestService service) throws Exception {
-		HttpPost httppost = new HttpPost(SERVICE_URL + service.getPath());
+		HttpPost httppost = new HttpPost(serverURL + service.getPath());
 		HttpEntity entity = new EntityTemplate(new MarshallerCP<T>(object, marshaller));
 		httppost.setHeader("Content-Type", mimeType);
 		httppost.setEntity(entity);
@@ -234,7 +259,7 @@ public abstract class TestRestService {
 	}
 
 	private <T> T get(Object id, Class<T> clazz, RestService service) throws Exception {
-		HttpGet httpget = new HttpGet(SERVICE_URL + service.getPath() + "/" + id);
+		HttpGet httpget = new HttpGet(serverURL + service.getPath() + "/" + id);
 		httpget.setHeader("Content-Type", mimeType);
 		HttpResponse response = httpclient.execute(httpget);
 
@@ -243,7 +268,7 @@ public abstract class TestRestService {
 	}
 
 	private <T> T put(T object, Class<T> clazz, RestService service) throws Exception {
-		HttpPut httpput = new HttpPut(SERVICE_URL + service.getPath());
+		HttpPut httpput = new HttpPut(serverURL + service.getPath());
 		HttpEntity entity = new EntityTemplate(new MarshallerCP<T>(object, marshaller));
 		httpput.setHeader("Content-Type", mimeType);
 		httpput.setEntity(entity);
@@ -254,7 +279,7 @@ public abstract class TestRestService {
 	}
 	
 	private <T> int delete(Long id, Class<T> clazz, RestService service) throws Exception {
-		HttpDelete httpdelete = new HttpDelete(SERVICE_URL + service.getPath() + "/" + id);
+		HttpDelete httpdelete = new HttpDelete(serverURL + service.getPath() + "/" + id);
 		HttpResponse response = httpclient.execute(httpdelete);
 		
 		logger.debug("status: " + response.getStatusLine().getStatusCode());

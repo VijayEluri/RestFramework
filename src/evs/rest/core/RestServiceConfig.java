@@ -14,6 +14,7 @@ import evs.rest.core.annotations.RestId;
 import evs.rest.core.annotations.RestPath;
 import evs.rest.core.annotations.RestSearchIndexedFields;
 import evs.rest.core.annotations.RestSearchPath;
+import evs.rest.core.interceptors.RestInterceptor;
 import evs.rest.core.marshal.RestFormat;
 import evs.rest.core.persistence.RestPersistence;
 import evs.rest.core.util.RestConst;
@@ -64,8 +65,14 @@ public abstract class RestServiceConfig extends HttpServlet {
 	/**
 	 * the search path, the implementing @RestService is configured for
 	 */
-	protected String searchPath;
+	protected String searchPath = null;
 	
+	/**
+	 * a list of @RestInterceptor instances, the implementing @RestService uses for logging
+	 */
+	protected List<RestInterceptor> interceptors = new ArrayList<RestInterceptor>();
+
+
 	public RestServiceConfig() throws Exception {
 		processRestEntityAnnotation();
 		processRestIdAnnotation();
@@ -215,6 +222,24 @@ public abstract class RestServiceConfig extends HttpServlet {
 	
 	public void setSearchPath(String searchPath) {
 		this.searchPath = searchPath;
+	}
+	
+	public List<String> getSearchIndexedFields() {
+		return searchIndexedFields;
+	}
+
+	public void setSearchIndexedFields(List<String> searchIndexedFields) {
+		this.searchIndexedFields = searchIndexedFields;
+	}
+
+
+	public List<RestInterceptor> getInterceptors() {
+		return interceptors;
+	}
+
+
+	public void setInterceptors(List<RestInterceptor> interceptors) {
+		this.interceptors = interceptors;
 	}
 
 }

@@ -11,7 +11,7 @@ public enum RestFormat {
 	
 	private static Logger logger = Logger.getLogger(RestFormat.class);
 	
-	public static RestFormat fromMimeType(String mimeType) throws RestFormatException {
+	public static RestFormat fromMimeType(String mimeType) throws UnknownRestFormatException {
 		//if(mimeType == null)
 		//	return RestConst.DEFAULT_FORMAT;
 		
@@ -24,7 +24,7 @@ public enum RestFormat {
 			return XML;
 		}
 		
-		RestFormatException e = new RestFormatException("no RestFormat applies to mimeType: " + mimeType);
+		UnknownRestFormatException e = new UnknownRestFormatException("no RestFormat applies to mimeType: " + mimeType);
 		logger.debug(e.getMessage(), e);
 		throw e;
 	}

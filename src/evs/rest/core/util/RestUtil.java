@@ -1,6 +1,7 @@
 package evs.rest.core.util;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,8 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import evs.rest.core.RestServiceConfig;
+import evs.rest.core.marshal.RestFormat;
+import evs.rest.core.marshal.UnknownRestFormatException;
 import evs.rest.core.marshal.RestMarshaller;
 import evs.rest.core.marshal.RestMarshallerException;
+import evs.rest.core.marshal.RestMarshallerFactory;
 
 public class RestUtil {
 	private static Logger logger = Logger.getLogger(RestUtil.class);
@@ -75,44 +79,34 @@ public class RestUtil {
 	}
 	
 	
-	/**
-	 * reads an object from a given request by using the marshaller provided
-	 * @param req the request object, to retrieve the @InputStream from
-	 * @param marshaller the marshaller, to unserialize the object
-	 * @param clazz the object class
-	 * @return the object on success, null on error
-	 */
-	public static <T> T unmarshalRequest(HttpServletRequest req,
-			RestMarshaller marshaller, Class<T> clazz) {
 
-		try {
-			return marshaller.read(clazz, req.getInputStream());
-		} catch (RestMarshallerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	/**
-	 * responds by marshaling a given object
-	 * @param resp servlet response which holds the @OutputStream
-	 * @param marshaller marshaller to serialize the object
-	 * @param myObject the object to marshal
+	 * provides a marshaller instance by comparing a @HttpServletRequest mime-type with a list of supported @RestFormat formats
+	 * @param req the request specifying the mime-type
+	 * @param formats a list of supported formats
+	 * @return the marshaller on success, else null 
 	 */
-	public static void marshalResponse(HttpServletResponse resp,
-			RestMarshaller marshaller, Object myObject) {
+	public static RestMarshaller getMarshallerFromMimeCheck(
+			HttpServletRequest req, List<RestFormat> formats) {
+		String mimeType = req.getContentType();
+		logger.debug("determining marshaller for request format mimeType: " + mimeType);
 		try {
-			marshaller.write(myObject, resp.getOutputStream());
-		} catch (RestMarshallerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(mimeType != null) {
+				//format specified
+				RestFormat requestFormat = RestFormat.fromMimeType(mimeType);
+				if(formats.contains(requestFormat)) {
+					return RestMarshallerFactory.getMarshaller(requestFormat);
+				}
+				//TODO: requested format not supported by service
+				return null;
+			}
+			else {
+				logger.debug("no format specified, using default formatter");
+				return RestMarshallerFactory.getMarshaller(formats.get(0));
+			}
+		} catch (UnknownRestFormatException e) {
+			//TODO: requested format unknown
+			return null;
 		}
 	}
 

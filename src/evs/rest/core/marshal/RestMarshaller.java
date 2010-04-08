@@ -23,6 +23,6 @@ public interface RestMarshaller {
 	 * @param output the output stream to serialize the object to
 	 * @throws RestMarshallerException
 	 */
-	public void write(Object object, OutputStream output) throws RestMarshallerException;
+	public <T> void write(T object, OutputStream output) throws RestMarshallerException;
 
 }
